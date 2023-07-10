@@ -65,9 +65,10 @@ USERNAME = 'master Potes'
 TEST = 'test complete'
 HI = f'Hello {USERNAME}'
 ACTIVE = "that's my name. at your service"
+KEY = open('.key').read()
 
 def GenerateResponse(text):
-    openai.api_key = "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"
+    openai.api_key = KEY
     response = openai.Completion.create(
         engine = "text-davinci-003",
         prompt = text,
@@ -107,17 +108,12 @@ def answer(textDetected):
     
 
 if __name__ == "__main__":
-    #print(speech())
-    #cad = []'test.wav',
-    #ans = answer(cad)
-    #print(cad.split(' '))
-    #print(file_exists('test.wav'),file_exists('hi.wav'),file_exists('bob.wav'))
     cad = speech()
-    #GenerateResponse(cad)
     try:
         playsound(answer(cad))
     except:
         playsound('question.wav')
+    
     
     
 
