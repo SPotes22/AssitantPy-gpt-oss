@@ -3,12 +3,18 @@ import subprocess
 import PyPDF2
 import pyttsx3
 import sys
+import webbrowser
 from playsound import playsound
+from  os import remove 
 from os.path import exists as file_exists
 import openai
-#from IPython.display import display, Markdown
-#import yfinance as yf
-
+from spotipy.oauth2 import SpotifyClientCredentials
+import spotipy
+import sys
+import pprint
+import webbrowser
+import pyautogui
+from time import sleep
 
 
 class Error():
@@ -66,6 +72,7 @@ TEST = 'test complete'
 HI = f'Hello {USERNAME}'
 ACTIVE = "that's my name. at your service"
 KEY = open('.key').read()
+RESULT = 'I have finished searching on YouTube. Based on your query, I found these videos that might interest you. Feel free to check it out!'
 
 def GenerateResponse(text):
     openai.api_key = KEY
@@ -79,42 +86,115 @@ def GenerateResponse(text):
     answer = response.choices[0].text
     print(answer)
     convert_text_to_audio(answer, 'question' , rate=150, volume=1.0, voice=1)
-    
 
 
+def YTsearch():
+    search = speech() #input('enter the topic and thing you want to search on YT: ')
+    if len(search) > 0:
+        search_query = search
+        youtube_search_url = f"https://www.youtube.com/results?search_query={search_query}"
+        webbrowser.open(youtube_search_url)
+    if file_exists('YouTube.wav'):
+        return 'result.wav'
+    else:
+        convert_text_to_audio(RESULT, 'YouTube', rate=150, volume=1.0, voice=1),
+        return 'YouTube.wav'
 
 
+def Spiderman():
+    flag = 0
+    client_id = "3814284cc64f49f582a7f9c87374edc2"
+    client_secret = "7681d1b27c6c42cda5f0f49ab16ac657"
+    artist = 'Alicia Keys'
+    song = "it's on again"
+
+    if len(artist) > 0:
+        sp = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials(client_id, client_secret))
+        result = sp.search(q=song, type='track', limit=50)
+        
+        for track in result['tracks']['items']:
+            artists = [artist['name'] for artist in track['artists']]
+            if artist in artists:
+                flag = 1
+                webbrowser.open(track['uri'])
+                sleep(5)
+                pyautogui.press("enter")
+                break  # Exit the loop once a matching song is found
+
+    if flag == 0:
+        formatted_song = song.replace(" ", "%20")
+        webbrowser.open(f'spotify:search:{formatted_song}')
+        sleep(5)
+        for _ in range(22):
+            pyautogui.press("tab")
+        pyautogui.press("enter")
+        pyautogui.press("enter")
+
+def Salsa():
+    flag = 0
+    client_id = "3814284cc64f49f582a7f9c87374edc2"
+    client_secret = "7681d1b27c6c42cda5f0f49ab16ac657"
+    artist = 'Adalberto Santiago'
+    song = "La noche mas linda"
+
+    if len(artist) > 0:
+        sp = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials(client_id, client_secret))
+        result = sp.search(q=song, type='track', limit=50)
+        
+        for track in result['tracks']['items']:
+            artists = [artist['name'] for artist in track['artists']]
+            if artist in artists:
+                flag = 1
+                webbrowser.open(track['uri'])
+                sleep(5)
+                pyautogui.press("enter")
+                break  # Exit the loop once a matching song is found
+
+    if flag == 0:
+        formatted_song = song.replace(" ", "%20")
+        webbrowser.open(f'spotify:search:{formatted_song}')
+        sleep(5)
+        for _ in range(22):
+            pyautogui.press("tab")
+        pyautogui.press("enter")
+        pyautogui.press("enter")
 
 def answer(textDetected):
     comands = {
-            'test' :  convert_text_to_audio(TEST, 'test' , rate=150, volume=1.0, voice=1),
-            'hi' : convert_text_to_audio(HI, 'hi' , rate=150, volume=1.0, voice=1),
-            'bob' :  convert_text_to_audio(ACTIVE, 'bob' , rate=150, volume=1.0, voice=1),
-            #'bob' : subprocess.check_call(['python','bob.py']),
-            #'Spider-Man' : subprocess.check_call(['python','SpiderTema.py']),
-            'question' : GenerateResponse(textDetected),
-        }
+        'test': convert_text_to_audio(TEST, 'test', rate=150, volume=1.0, voice=1),
+        'hi': convert_text_to_audio(HI, 'hi', rate=150, volume=1.0, voice=1),
+        'Bob': convert_text_to_audio(ACTIVE, 'bob', rate=150, volume=1.0, voice=1),
+        'question': GenerateResponse(textDetected),
+        'salsa' : Salsa,# subprocess.check_call(['python','salsita.py']),
+        'Spider-Man' : Spiderman, #subprocess.check_call(['python','SpiderTema.py']),
+        'YouTube' : YTsearch,#subprocess.check_call(['python','ytTest.py']),
+    }
+    comand_keys = comands.keys()
     text = textDetected.split(" ")
+
     for word in text:
-        print(word)
-        if word in comands.keys():
-            print('detected,\nProceed to respond')              
+        if (word in comand_keys):
+            print('Detected command:', word)
             filename = word + '.wav'
             if file_exists(filename):
                 return filename
             else:
-                print('generating...')
-                comands[word]
+                print('Generating...')
+                comands[word]()
+                return  filename
+        else:
+            print('this is not a comand')
+    return None 
     
 
 if __name__ == "__main__":
+    remove('YouTube.wav')
     cad = speech()
     try:
         playsound(answer(cad))
     except:
         playsound('question.wav')
-    
-    
-    
+        
 
     
+
