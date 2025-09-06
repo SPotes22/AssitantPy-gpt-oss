@@ -7,8 +7,8 @@ import pyautogui
 from time import sleep
 
 flag = 0
-client_id = "3814284cc64f49f582a7f9c87374edc2"
-client_secret = "7681d1b27c6c42cda5f0f49ab16ac657"
+client_id = "YOUR_SPOTIFY_ID"
+client_secret = "YOUR_SPOTIFY_SECRET"
 artist = 'Adalberto Santiago'
 song = "La noche mas linda"
 
